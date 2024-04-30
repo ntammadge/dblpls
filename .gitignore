@@ -1,0 +1,10 @@
+# General
+*.exe
+*.log
+*.txt
+tmp
+out
+
+# JavaScript
+node_modules
+

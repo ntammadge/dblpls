@@ -44,3 +44,29 @@ func DeserializeMessage(msg []byte) (string, []byte, error) {
 
 	return message.Method, content[:contentLength], nil
 }
+
+// Defines the input stream split operation for the main program loop.
+// Takes input data, looks for the break between the "header" and content,
+// and advances the data read position after receiving the specified number of
+// bytes of data from the client.
+func Split(data []byte, _ bool) (advance int, token []byte, err error) {
+	// TODO: can part of this be abstracted to unify operations between input reading and deserialization?
+	header, content, found := bytes.Cut(data, []byte{'\r', '\n', '\r', '\n'})
+
+	if !found {
+		return 0, nil, nil
+	}
+
+	contentLengthBytes := header[len("Content-Length: "):] // TODO: len(header) or something, probably
+	contentLength, err := strconv.Atoi(string(contentLengthBytes))
+	if err != nil {
+		return 0, nil, err
+	}
+
+	if len(content) < contentLength {
+		return 0, nil, nil
+	}
+
+	totalLength := len(header) + 4 + contentLength
+	return totalLength, data[:totalLength], nil
+}
