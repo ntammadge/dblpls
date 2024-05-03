@@ -24,8 +24,16 @@ func main() {
 		if err != nil {
 			logger.Printf("Error deserializing message: %s", err.Error())
 			logger.Printf("Raw message: %s", data)
+			continue
 		}
-		// TODO: handle client error messages from our invalid replies
+
+		if method == "" {
+			// Messages without a method are expected to be error messages, but that may not be every message.
+			// Adding basic logging to get information for better understanding
+			logger.Printf("Received message with no method: %s", content)
+			continue
+		}
+
 		handleMessage(logger, method, content)
 	}
 }
@@ -43,8 +51,7 @@ func handleMessage(logger *log.Logger, method string, content []byte) {
 		logger.Printf("Connecting to client %s %s",
 			initReq.Params.ClientInfo.Name,
 			initReq.Params.ClientInfo.Version)
-
-		os.Stdout.Write([]byte(jsonrpc2.SerializeMessage(lsp.NewInitializeResponse(initReq.Id))))
+		os.Stdout.Write([]byte(jsonrpc2.SerializeMessage(lsp.NewInitializeResponse(initReq.Id)))) // TODO: come up with something more elegant
 	case "initialized":
 		logger.Println("Connected to client")
 	}
