@@ -54,6 +54,13 @@ func handleMessage(logger *log.Logger, method string, content []byte) {
 		os.Stdout.Write([]byte(jsonrpc2.SerializeMessage(lsp.NewInitializeResponse(initReq.Id)))) // TODO: come up with something more elegant
 	case "initialized":
 		logger.Println("Connected to client")
+	case "textDocument/didOpen":
+		var req lsp.DidOpenTextDocumentNotification
+		if err := json.Unmarshal(content, &req); err != nil {
+			logger.Printf("Couldn't parse open notification: %s", err)
+			break
+		}
+		logger.Printf("Opened: %s", req.Params.TextDocument.Uri)
 	}
 }
 

@@ -34,6 +34,7 @@ type ServerInfo struct {
 }
 
 type ServerCapabilities struct {
+	TextDocumentSync int `json:"textDocumentSync"`
 }
 
 func NewInitializeResponse(id int) InitializeResponse {
@@ -46,6 +47,9 @@ func NewInitializeResponse(id int) InitializeResponse {
 			ServerInfo: ServerInfo{
 				Name:    "dblpls",
 				Version: "0.1.0", // TODO: automate/parameterize this
+			},
+			Capabilities: ServerCapabilities{
+				TextDocumentSync: 2, // Incremental
 			},
 		},
 	}
